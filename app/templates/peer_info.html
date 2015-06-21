@@ -1,0 +1,71 @@
+{% extends "layout.html" %} 
+{% import "bootstrap/wtf.html" as wtf %} 
+
+{% block title %}
+{{ super()}}
+- {{ peer.ip }}
+{% endblock %} 
+
+{% block page_content %}
+{{ super() }}
+
+
+<div class="container">
+	
+	<div class="col-md-12">
+		{% for category, message in get_flashed_messages(with_categories=true) %} 
+		<div class="alert alert-{{ category }}">
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+			{{ message }}
+		</div>
+		{% endfor %}
+		
+		</br>
+
+		<div class="row">
+			<div class="col-md-12 panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">
+						{% if peer.state == 'up' or peer.state == 'connected' %}
+							<i class="fa fa-circle text-success"></i>
+						{% else %}
+							<i class="fa fa-circle text-danger"></i>
+						{% endif %}
+						Peer: {{ peer.ip }} ({{ peer.asn }})
+					</h3>
+				</div>
+				</br>
+				<div class="panel-body">
+					<ul>
+						
+					{% for prefix in peer.current_prefixes %}
+						<li>{{ prefix }}</li>
+					{% endfor %}
+					</ul>
+			    </div>
+
+			</div>
+
+			
+		</div>
+
+	
+
+		
+		
+	</div>
+</div>
+
+
+
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+
+<script type="text/javascript">
+	
+</script>
+
+{% endblock %}

@@ -22,12 +22,12 @@ def dashboard():
 
 	return render_template('dashboard.html', updates=updates, peers=peers)
 
-# @app.route('/peer/<peer_id>')
-# def peer(peer_id):
+@app.route('/peer/<peer_id>')
+def peer(peer_id):
 
-# 	peer = bgp_peers.find_one({'_id': peer_id})
-# 	state
-# 	last_updates
+	peer = bgp_peers.find_one({'_id': ObjectId(peer_id)})
+
+	return render_template('peer_info.html', peer=peer)
 
 
 @app.route('/command', methods=['POST'])

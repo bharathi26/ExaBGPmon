@@ -52,11 +52,16 @@
 				</br>
 				<div class="panel-body">
 					{% for peer in peers %}
-						<p>
-							<strong>{{ peer.ip }}:</strong>
-							{{ peer.asn }} --
-							{{ peer.state }}
-						</p>
+						
+						<a class="btn btn-default" href="{{ url_for('peer', peer_id=peer['_id']) }}">
+							{% if peer.state == 'up' or peer.state == 'connected' %}
+								<i class="fa fa-circle text-success"></i>
+							{% else %}
+								<i class="fa fa-circle text-danger"></i>
+							{% endif %}
+							<strong>{{ peer.ip }}: </strong> {{ peer.asn }}
+						</a>
+
 					{% endfor %}
 				</div>
 			</div>
