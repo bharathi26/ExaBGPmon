@@ -1,6 +1,7 @@
 *.sublime-*
 pip-selfcheck.json
 
+*.pyc
 etc/exabgp/*
 .Python
 bin/

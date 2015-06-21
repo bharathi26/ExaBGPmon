@@ -1,18 +1,14 @@
+from bson.objectid import ObjectId
 from time import mktime
 from datetime import datetime, timedelta
 from flask import Flask, request, render_template, flash
 from flask_bootstrap import Bootstrap
 from sys import stdout
-from pymongo import MongoClient, ASCENDING, DESCENDING
+from pymongo import ASCENDING, DESCENDING
+from models import db, bgp_updates, bgp_peers
 
 app = Flask(__name__)
 Bootstrap(app)
-
-client = MongoClient()
-db = client.exabgp_db
-bgp_updates = db.bgp_updates
-bgp_peers = db.bgp_peers
-
 
 def minutes_ago(minutes):
 
