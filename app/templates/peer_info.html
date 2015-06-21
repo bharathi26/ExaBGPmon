@@ -3,7 +3,7 @@
 
 {% block title %}
 {{ super()}}
-- {{ peer.ip }}
+{{ peer.ip }}
 {% endblock %} 
 
 {% block page_content %}
@@ -36,17 +36,63 @@
 				</div>
 				</br>
 				<div class="panel-body">
+					<h5 class="">
+						Received Prefixes
+					</h5>
 					<ul>
-						
-					{% for prefix in peer.current_prefixes %}
-						<li>{{ prefix }}</li>
-					{% endfor %}
+						{% for prefix in peer.current_prefixes %}
+							<li>{{ prefix }}</li>
+						{% endfor %}
 					</ul>
 			    </div>
 
 			</div>
 
-			
+		</div>
+
+		<div class="row">
+			<div class="panel panel-default col-md-12">
+				<div class="panel-heading">
+					<h3 class="panel-title">Advertised Routes</h3>
+				</div>
+				<div class="panel-body">
+					<ul class="list-group">
+						{% for route in advertised_routes %}
+							<li class="list-group-item">
+								{{ route.prefix }} -- ({{ route.attributes }})
+								<a href="{{ url_for('delete_adv_route', peer_id=peer['_id'], adv_route_id=route['_id']) }}" class="pull-right" data-id="{{ route['_id'] }}">
+									<i class="fa fa-times text-danger"></i>
+								</a>
+							</li>
+						{% endfor %}
+					</ul>
+
+					<div class="row">
+						<form class='form-inline' method="POST">
+							{% if form.errors %}
+							    <ul class="errors">
+							        {% for field_name, field_errors in form.errors|dictsort if field_errors %}
+							            {% for error in field_errors %}
+							                <li>{{ form[field_name].label }}: {{ error }}</li>
+							            {% endfor %}
+							        {% endfor %}
+							    </ul>
+							{% endif %}
+
+							{{ form.hidden_tag() }}
+							{{ wtf.form_errors(form, hiddens="only") }}
+
+							{{ wtf.form_field(form.prefix) }}
+							{{ wtf.form_field(form.next_hop) }}
+							{{ wtf.form_field(form.origin) }}
+							{{ wtf.form_field(form.local_pref, class="width80 form-control") }}
+							{{ wtf.form_field(form.med, class="width80 form-control") }}
+
+							{{ wtf.form_field(form.submit, button_map={'submit': 'primary'}) }}
+						</form>
+				 	</div>
+				</div>
+			</div>
 		</div>
 
 	

@@ -25,6 +25,9 @@ img.plugin {
   max-width: 300px;
 }
 
+.width80 {
+  width: 80px !important;
+}
 /*########  Special Layouts ########*/
 
 @media (min-width : 992px) {
