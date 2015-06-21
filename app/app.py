@@ -26,8 +26,8 @@ def minutes_ago(minutes):
 @app.route('/')
 def dashboard():
 
-	updates = [x for x in bgp_updates.find({'type': { '$nin': ['keepalive', 'state']}}).sort('time', DESCENDING).limit(10)]
-	peers = [x for x in bgp_peers.find()]
+	updates = [x for x in bgp_updates.find({'type': { '$nin': ['keepalive']}}).sort('time', DESCENDING).limit(10)]
+	peers = list(bgp_peers.find())
 
 	return render_template('dashboard.html', updates=updates, peers=peers)
 
@@ -77,6 +77,13 @@ def delete_adv_route(peer_id, adv_route_id):
 
 	flash('%s has been withdrawn from %s.' % (adv_route['prefix'], peer['ip']), 'success')
 	return redirect(url_for('peer', peer_id=peer_id))
+
+@app.route('/config', methods=['GET', 'POST'])
+def config():
+
+	peers = list(bgp_peers.find())
+
+	return render_template('config.html', peers=peers)
 
 @app.route('/command', methods=['POST'])
 def command():
