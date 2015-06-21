@@ -3,7 +3,7 @@
 
 {% block title %}
 {{ super()}}
-- Dashboard
+Dashboard
 {% endblock %} 
 
 {% block page_content %}
@@ -32,7 +32,7 @@
 					{% for update in updates %}
 						<p>
 							<strong>{{ update.type }}:</strong>
-							{{ update.peer }} -- 
+							{{ update.peer }} ({{ update['time']|datetimeformat }}) -- 
 							{% if update.type == 'state' %}
 								{{ update.state }}
 							{% elif update.type == 'update' %}

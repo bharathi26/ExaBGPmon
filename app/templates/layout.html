@@ -3,7 +3,7 @@
 {% block head %}
 {{super()}}
 
-<title>ExaBGPmon - {% block title %}{% endblock %}</title> 
+<title>{% block title %}ExaBGPmon - {% endblock %}</title> 
 <!-- <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}"> -->
 <!-- <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script> -->
 <!-- <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script> -->
@@ -63,5 +63,18 @@
 
 {% block scripts %}
 {{ super() }}
+<script src="{{ url_for('static', filename='notify.min.js') }}"></script>
+
+<script type="text/javascript">
+
+    $(document).ready(function() {
+         
+         $.notify.defaults({ globalPosition: "right bottom", autoHide: false});
+         {% for category, message in get_flashed_messages(with_categories=true) %} 
+            $.notify('{{ message|safe }}', '{{ category }}');
+         {% endfor %}
+         
+    });
+</script>
 
 {% endblock %}
