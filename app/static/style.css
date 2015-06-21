@@ -102,7 +102,9 @@ img.plugin {
 	box-shadow: 3px 3px 5px #3d3d3d;
 }
 
-
+a.btn {
+  margin-bottom: 10px;
+}
 .btn span, .btn a{
 	color: #fff;
 	text-decoration: none;
@@ -110,19 +112,6 @@ img.plugin {
 
 .spinner {
 	padding-top: 20px;
-}
-
-.dropzone-previews {
-  padding: 12px;
-  min-height: 160px;
-  margin-bottom: 10px;
-}
-
-.dropzone-previews h4 {
-  padding-top: 40px;
-}
-.dropzone-previews .dz-preview .dz-details {
-  height: 30px;
 }
 
 /* ======= Header ======= */
