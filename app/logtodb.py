@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 
+import json
 import os
 import sys
-import json
-from datetime import datetime
 import time
+from datetime import datetime
 from pymongo import MongoClient
+from tasks import announce_route, withdraw_route
 
 ########################################
 ###### Syslog for Troubleshooting ######
@@ -27,6 +28,8 @@ updates = db.bgp_updates
 bgp_peers = db.bgp_peers
 
 counter = 0
+
+print 'test'
 
 def object_formatter(line):
     temp_message = json.loads(line)
@@ -110,10 +113,21 @@ def object_formatter(line):
             'state': temp_message['neighbor']['state'],
         }
 
-        bgp_peers.update_one({'ip': message['peer']}, {'$set': {'state': message['state']}})
+        if message['state'] in ('up'):
+            # Check if peer was previously down. If so, re-advertise routes
+            peer = bgp_peers.find_one({'ip': message['peer']})
+            if peer['state'] == 'down':
+                print 'peer %s recently came online' % peer['ip']
+                for route in adv_routes.find({'peer': peer['ip']}):
+                    print route['prefix']
+                    announce_route(peer, route)
+                    print 'route announced'
+            # Change state to up from down or connected
+            bgp_peers.update_one({'ip': message['peer']}, {'$set': {'state': message['state']}})
 
-        if message['state'] in ('up', 'connected'):
             return message
+        else:
+            bgp_peers.update_one({'ip': message['peer']}, {'$set': {'state': message['state']}})
 
         try:
             if 'closed by the remote end' in temp_message['neighbor']['reason']:
@@ -125,7 +139,15 @@ def object_formatter(line):
 
         return message
 
+    elif temp_message['type'] == 'notification':
+        if temp_message['notification'] == 'shutdown':
+            for peer in bgp_peers.find():
+                bgp_peers.update({'ip': peer['ip']}, { '$set': {'state': 'down'}})
+
+        return None
+
     else:
+        # syslog.syslog(syslog.LOG_ALERT, _prefixed('DEBUG', temp_message))
         return None
 
 while True:
