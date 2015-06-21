@@ -2,7 +2,7 @@
 
 import json
 import os
-import sys
+from sys import stdin, stdout
 import time
 from datetime import datetime
 from pymongo import MongoClient
@@ -26,10 +26,9 @@ client = MongoClient()
 db = client.exabgp_db
 updates = db.bgp_updates
 bgp_peers = db.bgp_peers
+adv_routes = db.adv_routes
 
 counter = 0
-
-print 'test'
 
 def object_formatter(line):
     temp_message = json.loads(line)
@@ -116,12 +115,14 @@ def object_formatter(line):
         if message['state'] in ('up'):
             # Check if peer was previously down. If so, re-advertise routes
             peer = bgp_peers.find_one({'ip': message['peer']})
-            if peer['state'] == 'down':
-                print 'peer %s recently came online' % peer['ip']
+            if peer['state'] != 'up':
                 for route in adv_routes.find({'peer': peer['ip']}):
-                    print route['prefix']
-                    announce_route(peer, route)
-                    print 'route announced'
+                    # announce_route(peer, route)
+                    announcement =  'neighbor %s announce route %s next-hop %s' % (
+                        peer['ip'], route['prefix'], route['attributes']['next-hop'])
+                    stdout.write( announcement + '\n')
+                    stdout.flush()
+
             # Change state to up from down or connected
             bgp_peers.update_one({'ip': message['peer']}, {'$set': {'state': message['state']}})
 
@@ -152,7 +153,7 @@ def object_formatter(line):
 
 while True:
     try:
-        line = sys.stdin.readline().strip()
+        line = stdin.readline().strip()
         
         # When the parent dies we are seeing continual newlines, so we only access so many before stopping
         if line == "":
