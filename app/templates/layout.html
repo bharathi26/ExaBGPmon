@@ -1,0 +1,78 @@
+{% extends "bootstrap/base.html" %}
+
+{% block head %}
+{{super()}}
+
+<title>ExaBGPmon - {% block title %}{% endblock %}</title> 
+<!-- <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}"> -->
+<!-- <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script> -->
+<!-- <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script> -->
+
+{% endblock %}
+
+
+
+{% block styles %}
+{{ super() }}
+<link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dropzone.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+{% endblock %}
+    
+{% block content %}
+	<header id="header" class="header">  
+        <div class="container">            
+            <h1 class="logo pull-left">
+                <a class="scrollto" href="{{url_for('dashboard')}}">
+                    <span class="logo-title">BGP mon</span>
+                </a>
+            </h1><!--//logo-->              
+            <nav id="main-nav" class="main-nav navbar-right" role="navigation">
+                <div class="navbar-header">
+                    <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button><!--//nav-toggle-->
+                </div><!--//navbar-header-->            
+                <div class="navbar-collapse collapse" id="navbar-collapse">
+                    <ul class="nav navbar-nav">
+                        <li class="nav-item sr-only active"><a href="#">Home</a></li>
+                        <!-- <li class="nav-item"><a href="{{url_for('dashboard')}}">Features</a></li> -->
+                    </ul><!--//nav-->
+                </div><!--//navabr-collapse-->
+            </nav><!--//main-nav-->
+        </div>
+    </header>
+
+
+	<div id="wrapper">
+    {% block page_content %}
+    {% endblock %}
+    </div>
+	
+    <div class="footer text-center">
+        <div class="well">
+        <h5 class="">Brought to you by <a href="https://www.thepacketgeek.com" title="thePacketGeek.com" target="_blank">thePacketGeek</a>. See more projects like this on <a href="https://www.github.com/thepacketgeek" title="GitHub.com/thePacketGeek" target="_blank">GitHub</a>
+        </h5>
+    </div>
+    
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-44238008-4', 'auto');
+  ga('send', 'pageview');
+
+</script>
+{% endblock %}
