@@ -22,13 +22,25 @@ syslog.openlog("ExaBGP")
 ########################################
 ##############  DB Setup ###############
 ########################################
+#This can possibly be imported from models
+#I'm not sure yet as it might be good to keep it separate with the ExaBGP process
 client = MongoClient()
 db = client.exabgp_db
 updates = db.bgp_updates
 bgp_peers = db.bgp_peers
 adv_routes = db.adv_routes
+bgp_config = db.bgp_config
 
-counter = 0
+def update_state(state):
+
+    # Update ExaBGP state and last_start
+    current_config = bgp_config.find_one()
+    if state == 'running':
+        bgp_config.update(current_config, {'$set': {'state': 'running', 'last_start': datetime.now()}})
+    else:
+        bgp_config.update(current_config, {'$set': {'state': state, 'last_stop': datetime.now()}})
+
+update_state('running')
 
 def object_formatter(line):
     temp_message = json.loads(line)
@@ -143,7 +155,10 @@ def object_formatter(line):
     elif temp_message['type'] == 'notification':
         if temp_message['notification'] == 'shutdown':
             for peer in bgp_peers.find():
+                # Mark peers as offline
                 bgp_peers.update({'ip': peer['ip']}, { '$set': {'state': 'down'}})
+
+                update_state('stopped')
 
         return None
 
@@ -151,6 +166,7 @@ def object_formatter(line):
         # syslog.syslog(syslog.LOG_ALERT, _prefixed('DEBUG', temp_message))
         return None
 
+counter = 0
 while True:
     try:
         line = stdin.readline().strip()
