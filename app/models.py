@@ -5,6 +5,7 @@ db = client.exabgp_db
 bgp_updates = db.bgp_updates
 adv_routes = db.adv_routes
 bgp_peers = db.bgp_peers
+bgp_config = db.bgp_config
 
 peer = {  #db.bgp_peers
 	'ip': '10.10.1.1',
@@ -22,4 +23,13 @@ adv_route = {
 		'origin': '?',
 		'next-hop': '2.2.2.2'
 	}
+}
+
+config = {
+	'local-as': 65001,
+	'router-id': '172.16.2.1',
+	'local-address': '172.16.2.1',
+	'state': 'running', #or stopped
+	'last_start': 'datetime object',
+	'last_stop': 'datetime object'
 }
