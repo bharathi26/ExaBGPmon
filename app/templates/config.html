@@ -42,7 +42,9 @@ Config
 					    			<th>ASN</th>
 					    			<th>Prefixes Received</th>
 					    			<th>Prefixes Advertised</th>
-					    			<th>Action</th>
+					    			<th>Action
+					    				<i class="fa fa-plus text-success pull-right" style="padding-top: 3px;"></i>
+					    			</th>
 					    		</thead>
 					    		<tbody>
 						    		{% for peer in peers %}
@@ -69,7 +71,30 @@ Config
 					    </div>
 
 					    <div role="tabpanel" class="tab-pane" id="exabgp">
-					    	
+					    	<h4 class="">Status</h4>
+
+					    		{% if config['state'] == 'running' %}
+					    			<p class="text-success">
+						    			ExaBGP is currently {{ config['state']}} (since {{ config['last_start']|datetimeformat }})
+					    		{% else %}
+					    			<p class="text-danger">
+						    			ExaBGP is currently {{ config['state']}} (since {{ config['last_stop']|datetimeformat }})
+								{% endif %}
+									</p>
+					    		</p>
+					    	<h4 class="">Config</h4>
+
+					    	<form class='form' method="POST">
+
+								{{ config_form.hidden_tag() }}
+								{{ wtf.form_errors(config_form, hiddens="only") }}
+
+								{{ wtf.form_field(config_form.router_id) }}
+								{{ wtf.form_field(config_form.asn) }}
+								{{ wtf.form_field(config_form.local_ip) }}
+
+								{{ wtf.form_field(config_form.submit, button_map={'submit': 'primary'}) }}
+							</form>
 					    </div>
 					  </div>
 
@@ -97,7 +122,15 @@ Config
 {{ super() }}
 
 <script type="text/javascript">
-	
+	var url = document.location.toString();
+	if (url.match('#')) {
+	    $('.nav-tabs a[href=#'+url.split('#')[1]+']').tab('show') ;
+	} 
+
+	// Change hash for page-reload
+	$('.nav-tabs a').on('shown.bs.tab', function (e) {
+	    window.location.hash = e.target.hash;
+	});
 </script>
 
 {% endblock %}

@@ -6,14 +6,13 @@ from flask_bootstrap import Bootstrap
 from sys import stdout
 from pymongo import ASCENDING, DESCENDING
 from config import Config
-from models import db, bgp_updates, bgp_peers, adv_routes
-from forms import AdvertiseRoute
+from models import db, bgp_updates, bgp_peers, adv_routes, bgp_config
+from forms import AdvertiseRoute, ConfigForm
 from tasks import announce_route, withdraw_route
 
 app = Flask(__name__)
 app.config.from_object(Config)
 Bootstrap(app)
-
 
 def datetimeformat(value, format='%c'):
     return value.strftime(format)
@@ -81,9 +80,29 @@ def delete_adv_route(peer_id, adv_route_id):
 @app.route('/config', methods=['GET', 'POST'])
 def config():
 
-	peers = list(bgp_peers.find())
+	config_form = ConfigForm()
+	
+	if config_form.validate_on_submit():
+		
+		bgp_config.update(bgp_config.find_one(), 
+			{'$set': {
+				'local-as': int(config_form.asn.data),
+				'router-id': config_form.router_id.data,
+				'local-address': config_form.local_ip.data
+			}
+		})
 
-	return render_template('config.html', peers=peers)
+		flash('Config successfully updated.', 'success')
+		return redirect(url_for('config', _anchor='exabgp'))
+
+	else:
+		peers = list(bgp_peers.find())
+		config = bgp_config.find_one()
+
+		config_form.asn.data = config['local-as']
+		config_form.router_id.data = config['router-id']
+		config_form.local_ip.data = config['local-address']
+		return render_template('config.html', peers=peers, config=config, config_form=config_form)
 
 @app.route('/command', methods=['POST'])
 def command():
