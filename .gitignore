@@ -3,8 +3,10 @@ pip-selfcheck.json
 
 *.pyc
 etc/exabgp/*
+etc/conf.ini
 .Python
 bin/
 lib/
 include/
 misc/
+share/
