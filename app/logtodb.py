@@ -55,7 +55,6 @@ def object_formatter(line):
         
         #Ignore EoR updates
         if temp_message['neighbor']['message'].get("eor", None):
-            # syslog.syslog(syslog.LOG_ALERT, _prefixed('INFO', 'Peer: %s, Update EoR' % temp_message['neighbor']['ip']))
             return None
 
         try:
@@ -152,7 +151,7 @@ def object_formatter(line):
 
         return message
 
-    elif temp_message['type'] == 'notification':
+    if temp_message['type'] == 'notification':
         if temp_message['notification'] == 'shutdown':
             for peer in bgp_peers.find():
                 # Mark peers as offline
@@ -163,7 +162,7 @@ def object_formatter(line):
         return None
 
     else:
-        # syslog.syslog(syslog.LOG_ALERT, _prefixed('DEBUG', temp_message))
+        syslog.syslog(syslog.LOG_ALERT, _prefixed('DEBUG', temp_message))
         return None
 
 counter = 0
@@ -183,35 +182,13 @@ while True:
         message = object_formatter(line)
 
         if message:
-            syslog.syslog(syslog.LOG_ALERT, _prefixed('INFO', message))
             try:
                 updates.insert_one(message)
             except:
                 syslog.syslog(syslog.LOG_ALERT, _prefixed('DEBUG', message))
 
     except KeyboardInterrupt:
-        pass
+        client.close()
     except IOError:
         # most likely a signal during readline
         pass
-
-client.close()
-
-# updates.find_one({'type':'state' })
-# updates.find_one({'neighbor.address.peer':'172.16.2.20'})
-# updates.find_one({'neighbor.address.peer':'172.16.2.10'})
-
-# List all updates (can filter too)
-# [x for x in updates.find()]
-# updates.find_one({'type':'update' })
-
-# Timestamp to datetime
-# test = updates.find_one({'type':'update' })
-# datetime.datetime.fromtimestamp(test['time'])
-
-
-#https://groups.google.com/forum/#!msg/exabgp-users/OKUwwxEmBgI/2dsXGEwVNqkJ
-# mkdir logs
-# touch logs/exabgp.log
-# chmod 755 logs/
-# sudo chown root:nogroup logs
