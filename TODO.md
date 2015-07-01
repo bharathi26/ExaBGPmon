@@ -1,15 +1,16 @@
 #### TODO
 
 ## General
-* Edit ExaBGP conf file
-	* Add peers?
-* How to access ExaBGP stdin
+* ExaBGP process checking periodically
+	* Celery & celerybeat
+	* subprocess.check_output(['supervisorctl', 'status'])
+* Loading .gif on ExaBGP service buttons
+* Add button to re-create config file
 
 ## Peers
-* Re-announce routes when a peer comes back up
-	* When state up received, check if it is currently down and then re-advertise
 * Edit
 	* ASN
+* Auto-reload ExaBGP config when peer is added/removed/modified
 
 ## Prefixes
 * New Object?
