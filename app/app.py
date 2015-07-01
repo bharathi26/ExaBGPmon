@@ -104,15 +104,6 @@ def config():
 		config_form.local_ip.data = config['local-address']
 		return render_template('config.html', peers=peers, config=config, config_form=config_form)
 
-@app.route('/command', methods=['POST'])
-def command():
-
-	command = request.form['command']
-	stdout.write( command + '\n')
-	stdout.flush()
-
-	return command + '\n'
 
 if __name__ == '__main__':
     app.run(debug=True)
-

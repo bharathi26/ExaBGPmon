@@ -1,4 +1,6 @@
 import os
+from requests import post
+from sys import stdout
 from jinja2 import Environment, FileSystemLoader
 
 def build_config_file(config, peers):
@@ -16,9 +18,13 @@ def build_config_file(config, peers):
 		ini_file.write(config_file)
 
 def announce_route(peer, adv_route):
-	print 'neighbor %s announce route %s next-hop %s' % (
+	message =  'neighbor %s announce route %s next-hop %s' % (
 		peer['ip'], adv_route['prefix'], adv_route['attributes']['next-hop'])
 
+	r = post('http://localhost:5001', {'command': message})
+
 def withdraw_route(peer, adv_route):
-	print 'neighbor %s withdraw route %s next-hop %s' % (
+	message =  'neighbor %s withdraw route %s next-hop %s' % (
 		peer['ip'], adv_route['prefix'], adv_route['attributes']['next-hop'])
+	
+	r = post('http://localhost:5001', {'command': message})

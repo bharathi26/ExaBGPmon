@@ -12,6 +12,13 @@ group exabgpmon {
 		receive-routes;
 		neighbor-changes;
 
+	}
+
+	process http-api { 
+		run {{ config['python-path'] }} {{ config['root-path'] }}/app/http_api.py; 
+		encoder json;
+		receive-routes;
+		neighbor-changes;
 	} 
 
 	{% for peer in peers %}
