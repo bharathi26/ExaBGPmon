@@ -10,6 +10,7 @@
 ## Peers
 * Edit
 	* ASN
+	* Enable/Disable
 * Auto-reload ExaBGP config when peer is added/removed/modified
 
 ## Prefixes
