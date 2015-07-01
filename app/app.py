@@ -1,14 +1,14 @@
 from bson.objectid import ObjectId
 from time import mktime
 from datetime import datetime, timedelta
-from flask import Flask, request, render_template, flash, redirect, url_for
+from flask import Flask, request, render_template, flash, redirect, url_for, jsonify
 from flask_bootstrap import Bootstrap
 from sys import stdout
 from pymongo import ASCENDING, DESCENDING
 from config import Config
 from models import db, bgp_updates, bgp_peers, adv_routes, bgp_config
 from forms import AdvertiseRoute, ConfigForm
-from tasks import announce_route, withdraw_route
+from tasks import announce_route, withdraw_route, exabpg_process
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -104,6 +104,21 @@ def config():
 		config_form.local_ip.data = config['local-address']
 		return render_template('config.html', peers=peers, config=config, config_form=config_form)
 
+@app.route('/config/exabgp/<action>')
+def config_action(action):
+
+	result = exabpg_process(action)
+
+	# Update ExaBGP state and last_start
+	current_config = bgp_config.find_one()
+	if action == 'stop':
+	    bgp_config.update(current_config, {'$set': {'state': 'stopped', 'last_stop': datetime.now()}})
+	elif action == 'restart':
+	    bgp_config.update(current_config, {'$set': {'state': 'running', 'last_start': datetime.now(), 'last_stop': datetime.now()}})
+	elif action == 'start':
+	    bgp_config.update(current_config, {'$set': {'state': 'running', 'last_start': datetime.now()}})
+
+	return jsonify(result=result), 200
 
 if __name__ == '__main__':
     app.run(debug=True)

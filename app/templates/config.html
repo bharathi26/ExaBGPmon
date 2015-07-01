@@ -76,9 +76,13 @@ Config
 					    		{% if config['state'] == 'running' %}
 					    			<p class="text-success">
 						    			ExaBGP is currently {{ config['state']}} (since {{ config['last_start']|datetimeformat }})
+						    			<button class="pull-right btn btn-default btn-xs command" data-action="stop">Stop</button>
+						    			<button class="pull-right btn btn-default btn-xs command" data-action="reload">Reload</button>
+						    			<button class="pull-right btn btn-default btn-xs command" data-action="restart">Restart</button>
 					    		{% else %}
 					    			<p class="text-danger">
 						    			ExaBGP is currently {{ config['state']}} (since {{ config['last_stop']|datetimeformat }})
+						    			<button class="pull-right btn btn-default btn-xs command" data-action="start">Start</button>
 								{% endif %}
 									</p>
 					    		</p>
@@ -127,9 +131,30 @@ Config
 	    $('.nav-tabs a[href=#'+url.split('#')[1]+']').tab('show') ;
 	} 
 
+	var loading = $('<i class="fa fa-spin fa-2x text-center fa-spinner"></i>');
+
 	// Change hash for page-reload
 	$('.nav-tabs a').on('shown.bs.tab', function (e) {
 	    window.location.hash = e.target.hash;
+	});
+
+	$('button.command').on('click', function(e){
+		var button = $(this);
+		var action = button.data('action');
+
+		$.ajax({
+   			beforeSend: function(){
+   				// button.html(loading);
+   			},
+   			type : "GET",
+   			url : "/config/exabgp/" + action,
+   			contentType: 'application/text;charset=UTF-8',
+   			success: function(resp){
+   				console.log(resp);
+				$.notify(resp['result'], 'success');
+
+   			}
+		});
 	});
 </script>
 
