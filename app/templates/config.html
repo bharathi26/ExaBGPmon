@@ -72,20 +72,18 @@ Config
 
 					    <div role="tabpanel" class="tab-pane" id="exabgp">
 					    	<h4 class="">Status</h4>
-
-					    		{% if config['state'] == 'running' %}
-					    			<p class="text-success">
-						    			ExaBGP is currently {{ config['state']}} (since {{ config['last_start']|datetimeformat }})
-						    			<button class="pull-right btn btn-default btn-xs command" data-action="stop">Stop</button>
+				    			<p id="exabgp-state" style="min-height: 30px;">
+				    				<span id="status">Loading...</span>
+				    				<span id="running" class="hidden">
 						    			<button class="pull-right btn btn-default btn-xs command" data-action="reload">Reload</button>
+				    					<button class="pull-right btn btn-default btn-xs command" data-action="stop">Stop</button>
 						    			<button class="pull-right btn btn-default btn-xs command" data-action="restart">Restart</button>
-					    		{% else %}
-					    			<p class="text-danger">
-						    			ExaBGP is currently {{ config['state']}} (since {{ config['last_stop']|datetimeformat }})
+				    				</span>
+				    				<span id="stopped" class="hidden">
 						    			<button class="pull-right btn btn-default btn-xs command" data-action="start">Start</button>
-								{% endif %}
-									</p>
-					    		</p>
+				    				</span>
+				    			</p>
+
 					    	<h4 class="">Config</h4>
 
 					    	<form class='form' method="POST">
@@ -156,6 +154,34 @@ Config
    			}
 		});
 	});
+
+	function check_exabgp_status(){
+		$.ajax({
+   			type : "GET",
+   			url : "/config/exabgp/status",
+   			contentType: 'application/json;charset=UTF-8',
+   			success: function(resp){
+   				console.log(resp);
+   				var state = resp['state'];
+   				if (state == 'running'){
+   					$('p#exabgp-state span#status').html('ExaBGP is currently ' + state + ' (since ' + resp['last_start']);
+   					$('p#exabgp-state span#status').addClass('text-success');	
+   					$('p#exabgp-state span#status').removeClass('text-danger');
+   					$('p#exabgp-state span#running').removeClass('hidden');
+   					$('p#exabgp-state span#stopped').addClass('hidden');
+   				} else {
+   					$('p#exabgp-state span#status').html('ExaBGP is currently ' + state + ' (since ' + resp['last_stop']);
+   					$('p#exabgp-state span#status').addClass('text-danger');	
+   					$('p#exabgp-state span#status').removeClass('text-success');	
+   					$('p#exabgp-state span#stopped').removeClass('hidden');
+   					$('p#exabgp-state span#running').addClass('hidden');
+   				}
+   			}
+		});
+	}
+	check_exabgp_status()
+	setInterval(check_exabgp_status, 3000);
+
 </script>
 
 {% endblock %}

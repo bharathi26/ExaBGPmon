@@ -31,6 +31,16 @@ def withdraw_route(peer, adv_route):
 	
 	r = post('http://localhost:5001', {'command': message})
 
+def is_exabgp_running():
+	""" This function checks if the exabgp process is running. """
+
+	r = check_output(['supervisorctl', 'status'])
+
+	if 'RUNNING' in r:
+		return True
+	else:
+		return False
+
 def exabpg_process(action):
 	""" This function will check that supervisord is running and then start 
 	exabgp using the exabgpmon.conf file included with exabgpmon.
