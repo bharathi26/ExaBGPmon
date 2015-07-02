@@ -96,12 +96,6 @@ def config():
         return redirect(url_for('config', _anchor='exabgp'))
 
     else:
-        # Temp check for exabgp process (this will eventually be a scheduled task)
-        current_config = bgp_config.find_one()
-        if is_exabgp_running():
-            bgp_config.update(current_config, {'$set': {'state': 'running'}})
-        else:
-            bgp_config.update(current_config, {'$set': {'state': 'stopped'}})
 
         peers = list(bgp_peers.find())
         config = bgp_config.find_one()
@@ -131,6 +125,12 @@ def config_action(action):
 def exabgp_status():
 
     current_config = bgp_config.find_one()
+
+    # Update database
+    if is_exabgp_running():
+        bgp_config.update(current_config, {'$set': {'state': 'running'}})
+    else:
+        bgp_config.update(current_config, {'$set': {'state': 'stopped'}})
 
     return jsonify(state=current_config['state'],
         last_start=current_config['last_start'],

@@ -161,16 +161,20 @@ Config
    			url : "/config/exabgp/status",
    			contentType: 'application/json;charset=UTF-8',
    			success: function(resp){
-   				console.log(resp);
    				var state = resp['state'];
+   				
    				if (state == 'running'){
-   					$('p#exabgp-state span#status').html('ExaBGP is currently ' + state + ' (since ' + resp['last_start']);
+   					$('p#exabgp-state span#status').html('ExaBGP is currently ' + state);
+   					// var timestamp = new Date(resp['last_start']);
+   					// $('p#exabgp-state span#status').html('ExaBGP is currently ' + state + ' <small>(since ' + timestamp.toLocaleDateString() + timestamp.toLocaleTimeString() + ')<small>');
    					$('p#exabgp-state span#status').addClass('text-success');	
    					$('p#exabgp-state span#status').removeClass('text-danger');
    					$('p#exabgp-state span#running').removeClass('hidden');
    					$('p#exabgp-state span#stopped').addClass('hidden');
    				} else {
-   					$('p#exabgp-state span#status').html('ExaBGP is currently ' + state + ' (since ' + resp['last_stop']);
+   					// var timestamp = new Date(resp['last_stop']);
+   					$('p#exabgp-state span#status').html('ExaBGP is currently ' + state);
+   					// $('p#exabgp-state span#status').html('ExaBGP is currently ' + state + ' <small>(since ' + timestamp.toLocaleDateString() + timestamp.toLocaleTimeString() + ')</small>');
    					$('p#exabgp-state span#status').addClass('text-danger');	
    					$('p#exabgp-state span#status').removeClass('text-success');	
    					$('p#exabgp-state span#stopped').removeClass('hidden');
