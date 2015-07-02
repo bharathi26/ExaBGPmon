@@ -12,6 +12,8 @@
 	* ASN
 	* Enable/Disable
 * Auto-reload ExaBGP config when peer is added/removed/modified
+* Drop received-routes when peer is offline
+    * Re-populate when peer is back online  
 
 ## Prefixes
 * New Object?
