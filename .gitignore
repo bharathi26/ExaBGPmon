@@ -11,3 +11,5 @@ include/
 misc/
 share/
 conf.ini
+
+*.log
