@@ -105,6 +105,23 @@ def config():
         config_form.local_ip.data = config['local-address']
         return render_template('config.html', peers=peers, config=config, config_form=config_form)
 
+@app.route('/config/logs')
+def logs():
+
+    try:
+        limit = int(request.args.get('limit'))
+    except TypeError:
+        limit = 250
+
+    try:
+        exclude = request.args.get('exclude').split(',')
+    except:
+        exclude = []
+
+    updates = list(bgp_updates.find({'type': {'$nin': exclude}}, {'_id': False}).sort('time', DESCENDING).limit(limit))
+
+    return render_template('logs.html', updates=updates)
+
 @app.route('/config/exabgp/<action>')
 def config_action(action):
 

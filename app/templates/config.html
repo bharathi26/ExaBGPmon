@@ -29,6 +29,7 @@ Config
 					  <ul class="nav nav-tabs" role="tablist">
 					    <li role="presentation" class="active"><a href="#peers" aria-controls="home" role="tab" data-toggle="tab">Peers</a></li>
 					    <li role="presentation"><a href="#exabgp" aria-controls="profile" role="tab" data-toggle="tab">ExaBGP</a></li>
+					    <li role="presentation"><a href="#logs" aria-controls="profile" role="tab" data-toggle="tab">Logs</a></li>
 					  </ul>
 
 					  <!-- Tab panes -->
@@ -98,6 +99,45 @@ Config
 								{{ wtf.form_field(config_form.submit, button_map={'submit': 'primary'}) }}
 							</form>
 					    </div>
+
+			    	    <div role="tabpanel" class="tab-pane" id="logs">
+			    	    	
+			    	    	</br>
+			    	    	<div class="well clearfix">
+			    	    		<div class="col-md-3">
+				    	    		<div class="input-group">
+			    	    		      <span class="input-group-btn">
+			    	    		        <button class="btn btn-default" type="button">Limit</button>
+			    	    		      </span>
+			    	    		      <input id="limit" type="text" class="form-control" placeholder="50">
+			    	    		    </div>
+			    	    		</div>
+			    	    		
+			    	    		<div class="col-md-6">
+				    	    		<div class="btn-group" data-toggle="buttons" id="exclude_buttons">
+				    	    		  <!-- <span class="input-group-btn"> -->
+					    	    		  <label class="btn btn-default active">
+					    	    		    <input id="state" type="checkbox" autocomplete="off" checked> State
+					    	    		  </label>
+					    	    		  <label class="btn btn-default">
+					    	    		    <input id="update" type="checkbox" autocomplete="off"> Update
+					    	    		  </label>
+					    	    		  <label class="btn btn-default">
+					    	    		    <input id="notification" type="checkbox" autocomplete="off"> Notification
+					    	    		  </label>
+					    	    		  <label class="btn btn-default">
+					    	    		    <input id="keepalive" type="checkbox" autocomplete="off"> Keepalive
+					    	    		  </label>
+				    	    		  <!-- </span> -->
+				    	    		</div>
+				    	    	</div>
+			    	    	</div>
+			    	    	<div id="log-table">
+			    	    		
+			    	    	</div>
+			    	    </div>
+
+
 					  </div>
 
 					</div>
@@ -185,6 +225,36 @@ Config
 	}
 	check_exabgp_status()
 	setInterval(check_exabgp_status, 3000);
+
+	function get_logs(exclude, limit){
+		$.ajax({
+   			type : "GET",
+   			url : "/config/logs?limit=" + limit + "&exclude=" + exclude,
+   			contentType: 'application/json;charset=UTF-8',
+   			success: function(resp){
+   				$('div#log-table').html(resp);	
+   			}
+		});
+	}
+
+	$('a[href="#logs"]').on('show.bs.tab', function (e) {
+	    var limit = $('input#limit').val() || 50;
+	    var exclude = '';
+	    get_logs(exclude, limit);
+	});
+
+	$('#exclude_buttons input, input#limit').on('change', function(e){
+		var limit = $('input#limit').val() || 50;
+		var exclude = '';
+
+		$('#exclude_buttons input').each(function(e){
+			if (!$(this).prop('checked')) {
+				exclude += $(this).attr('id') + ',';
+			}
+		});
+		get_logs(exclude, limit);
+	});
+
 
 </script>
 

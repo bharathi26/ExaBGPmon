@@ -1,0 +1,34 @@
+<table class="table">
+	<thead>
+		<tr>
+			<th>Timestamp</th>
+			<th>Type</th>
+			<th>Peer</th>
+			<th>Info</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for update in updates %}
+			<tr>
+				<td>{{ update['time']|datetimeformat }}</td>
+				<td>{{ update['type']|title }}</td>
+				<td>{{ update['peer'] }}</td>
+				{% if update['type'] == 'state' %}
+					<td>{{ update['state']|title }}</td>
+				{% elif update['type'] == 'update' %}
+					{% if update['update']['announce'] %}
+						<td>{{ update['update']['announce'] }}</td>
+					{% else %}
+						<td>{{ update['update']['withdraw'] }}</td>
+					{% endif %}
+				{% elif update['type'] == 'notification' %}
+					<td>{{ update }}</td>
+				{% elif update['type'] == 'keepalive' %}
+					<td>Keepalive Received</td>
+				{% else %}
+					<td>Info</td>
+				{% endif %}
+			</tr>
+		{% endfor %}
+	</tbody>
+</table>
