@@ -9,6 +9,7 @@ from config import Config
 from models import db, bgp_updates, bgp_peers, adv_routes, bgp_config
 from forms import AdvertiseRoute, ConfigForm
 from tasks import announce_route, withdraw_route, exabpg_process, is_exabgp_running
+from requests import ConnectionError
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -55,8 +56,14 @@ def peer(peer_id):
         }
 
         adv_routes.insert_one(adv_route)
-        announce_route(peer, adv_route)
-        flash('%s has been announced to %s' % (adv_route['prefix'], peer['ip']), 'success')
+        
+        try:
+            announce_route(peer, adv_route)
+        except ConnectionError:
+            #Exabgp isn't running, but route will be advertised when it starts
+            flash('%s queued to be announced to %s' % (adv_route['prefix'], peer['ip']), 'success')
+        else:
+            flash('%s has been announced to %s' % (adv_route['prefix'], peer['ip']), 'success')
 
         return redirect(url_for('peer', peer_id=peer_id))
     
@@ -71,10 +78,16 @@ def delete_adv_route(peer_id, adv_route_id):
     peer = bgp_peers.find_one({'_id': ObjectId(peer_id)})
     adv_route = adv_routes.find_one({'_id': ObjectId(adv_route_id)})
 
-    withdraw_route(peer, adv_route)
+    try:
+        withdraw_route(peer, adv_route)
+    except ConnectionError:
+        #Exabgp isn't running, but route won't be advertised when it starts
+        flash('%s is queued to be withdrawn from %s.' % (adv_route['prefix'], peer['ip']), 'success')
+    else:
+        flash('%s has been withdrawn from %s.' % (adv_route['prefix'], peer['ip']), 'success')
+
     adv_routes.remove({'_id': ObjectId(adv_route_id)}, 1)
 
-    flash('%s has been withdrawn from %s.' % (adv_route['prefix'], peer['ip']), 'success')
     return redirect(url_for('peer', peer_id=peer_id))
 
 @app.route('/config', methods=['GET', 'POST'])
