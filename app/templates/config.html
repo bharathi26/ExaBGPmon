@@ -164,10 +164,6 @@ Config
 {{ super() }}
 
 <script type="text/javascript">
-	var url = document.location.toString();
-	if (url.match('#')) {
-	    $('.nav-tabs a[href=#'+url.split('#')[1]+']').tab('show') ;
-	} 
 
 	var loading = $('<i class="fa fa-spin fa-2x text-center fa-spinner"></i>');
 
@@ -223,8 +219,11 @@ Config
    			}
 		});
 	}
-	check_exabgp_status()
-	setInterval(check_exabgp_status, 3000);
+	
+	$('a[href="#exabgp"]').on('show.bs.tab', function(e) {
+		check_exabgp_status();
+		setInterval(check_exabgp_status, 3000);
+	});
 
 	function get_logs(exclude, limit){
 		$.ajax({
@@ -255,6 +254,10 @@ Config
 		get_logs(exclude, limit);
 	});
 
+	var url = document.location.toString();
+	if (url.match('#')) {
+	    $('.nav-tabs a[href=#'+url.split('#')[1]+']').tab('show') ;
+	}
 
 </script>
 
