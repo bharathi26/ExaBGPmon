@@ -1,22 +1,18 @@
 #### TODO
 
 ## General
-* ExaBGP process checking periodically
-	* Celery & celerybeat
-	* subprocess.check_output(['supervisorctl', 'status'])
-* Loading .gif on ExaBGP service buttons
+* ExaBGp process status icon
+	* in footer or header, just a green or red icon for ExaBGP process status
 * Add button to re-create config file
 
 ## Peers
 * Edit
-	* ASN
-	* Enable/Disable
+	* MD5 Auth
 * Auto-reload ExaBGP config when peer is added/removed/modified
-* Drop received-routes when peer is offline
-    * Re-populate when peer is back online  
 
 ## Prefixes
 * New Object?
 	* Select multiple peers to advertise to
 
 	*How to handle multiple next-hops? 
+* Route comments
