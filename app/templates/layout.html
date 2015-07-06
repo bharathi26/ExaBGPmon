@@ -21,6 +21,9 @@
 {% endblock %}
     
 {% block content %}
+
+    {% block modals %}
+    {% endblock %}
 	<header id="header" class="header">  
         <div class="container">            
             <h1 class="logo pull-left">
@@ -59,7 +62,11 @@
         </h5>
     </div>
     
+    
+
 {% endblock %}
+
+
 
 {% block scripts %}
 {{ super() }}
@@ -69,7 +76,7 @@
 
     $(document).ready(function() {
          
-         $.notify.defaults({ globalPosition: "right bottom", autoHide: false});
+         $.notify.defaults({ globalPosition: "right bottom", autoHide: true});
          {% for category, message in get_flashed_messages(with_categories=true) %} 
             $.notify('{{ message|safe }}', '{{ category }}');
          {% endfor %}

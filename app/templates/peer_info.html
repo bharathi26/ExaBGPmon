@@ -28,6 +28,16 @@
 				</div>
 				</br>
 				<div class="panel-body">
+				    <form class='form well form-inline' method="POST">
+		        		{{ peer_form.hidden_tag() }}
+		        		{{ wtf.form_errors(peer_form, hiddens="only") }}
+
+		        		{{ wtf.form_field(peer_form.ip_address, disabled=True) }}
+		        		{{ wtf.form_field(peer_form.asn) }}
+		        		{{ wtf.form_field(peer_form.enabled) }}
+
+						{{ wtf.form_field(peer_form.submit, button_map={'submit': 'primary'}) }}
+		        	</form>
 					<h5 class="">
 						Received Prefixes
 					</h5>
@@ -61,26 +71,26 @@
 
 					<div class="row">
 						<form class='form-inline' method="POST">
-							{% if form.errors %}
+							{% if route_form.errors %}
 							    <ul class="errors">
-							        {% for field_name, field_errors in form.errors|dictsort if field_errors %}
+							        {% for field_name, field_errors in route_form.errors|dictsort if field_errors %}
 							            {% for error in field_errors %}
-							                <li>{{ form[field_name].label }}: {{ error }}</li>
+							                <li>{{ route_form[field_name].label }}: {{ error }}</li>
 							            {% endfor %}
 							        {% endfor %}
 							    </ul>
 							{% endif %}
 
-							{{ form.hidden_tag() }}
-							{{ wtf.form_errors(form, hiddens="only") }}
+							{{ route_form.hidden_tag() }}
+							{{ wtf.form_errors(route_form, hiddens="only") }}
 
-							{{ wtf.form_field(form.prefix) }}
-							{{ wtf.form_field(form.next_hop) }}
-							{{ wtf.form_field(form.origin) }}
-							{{ wtf.form_field(form.local_pref, class="width80 form-control") }}
-							{{ wtf.form_field(form.med, class="width80 form-control") }}
+							{{ wtf.form_field(route_form.prefix) }}
+							{{ wtf.form_field(route_form.next_hop) }}
+							{{ wtf.form_field(route_form.origin) }}
+							{{ wtf.form_field(route_form.local_pref, class="width80 form-control") }}
+							{{ wtf.form_field(route_form.med, class="width80 form-control") }}
 
-							{{ wtf.form_field(form.submit, button_map={'submit': 'primary'}) }}
+							{{ wtf.form_field(route_form.submit, button_map={'submit': 'primary'}) }}
 						</form>
 				 	</div>
 				</div>

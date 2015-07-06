@@ -7,8 +7,8 @@ from sys import stdout
 from pymongo import ASCENDING, DESCENDING
 from config import Config
 from models import db, bgp_updates, bgp_peers, adv_routes, bgp_config
-from forms import AdvertiseRoute, ConfigForm
 from tasks import announce_route, withdraw_route, exabpg_process, is_exabgp_running
+from forms import AdvertiseRoute, ConfigForm, BGPPeer
 from requests import ConnectionError
 
 app = Flask(__name__)
@@ -34,24 +34,26 @@ def dashboard():
 @app.route('/peer/<peer_id>', methods=['GET', 'POST'])
 def peer(peer_id):
 
-    form = AdvertiseRoute()
+    route_form = AdvertiseRoute()
+    peer_form = BGPPeer()
+
     peer = bgp_peers.find_one({'_id': ObjectId(peer_id)})
 
-    if form.validate_on_submit():
+    if route_form.validate_on_submit():
         # Check if route is already advertised to this peer
-        if adv_routes.find_one({'peer': peer['ip'], 'prefix': form.prefix.data, 'next-hop': form.next_hop.data}):
+        if adv_routes.find_one({'peer': peer['ip'], 'prefix': route_form.prefix.data, 'next-hop': route_form.next_hop.data}):
             flash('%s is already being advertised to %s with a next-hop of %s.' % (
-                form.prefix.data, peer.ip, form.next_hop.data), 'warning')
+                route_form.prefix.data, peer.ip, route_form.next_hop.data), 'warning')
 
         # Create the advertised route object
         adv_route = {
-            'prefix': form.prefix.data,
+            'prefix': route_form.prefix.data,
             'peer': peer['ip'],
             'attributes': {
-                'origin': form.origin.data,
-                'local-preference': form.local_pref.data,
-                'med': form.med.data,
-                'next-hop': form.next_hop.data
+                'origin': route_form.origin.data,
+                'local-preference': route_form.local_pref.data,
+                'med': route_form.med.data,
+                'next-hop': route_form.next_hop.data
             }
         }
 
@@ -67,10 +69,22 @@ def peer(peer_id):
 
         return redirect(url_for('peer', peer_id=peer_id))
     
+    if peer_form.validate_on_submit():
+
+        bgp_peers.update(peer, {'$set': {
+            'asn': peer_form.asn.data,
+        }})
+
+        flash('Changes saved', 'success')
+        return redirect(url_for('peer', peer_id=peer_id))
+    
     else:
         advertised_routes = adv_routes.find({'peer': peer['ip']})
 
-        return render_template('peer_info.html', peer=peer, form=form, advertised_routes=advertised_routes)
+        peer_form.ip_address.data = peer['ip']
+        peer_form.asn.data = peer['asn']
+
+        return render_template('peer_info.html', peer=peer, route_form=route_form, peer_form=peer_form, advertised_routes=advertised_routes)
 
 @app.route('/peer/<peer_id>/withdraw/<adv_route_id>')
 def delete_adv_route(peer_id, adv_route_id):
@@ -90,10 +104,11 @@ def delete_adv_route(peer_id, adv_route_id):
 
     return redirect(url_for('peer', peer_id=peer_id))
 
-@app.route('/config', methods=['GET', 'POST'])
+@app.route('/config/', methods=['GET', 'POST'])
 def config():
 
     config_form = ConfigForm()
+    peer_form = BGPPeer()
     
     if config_form.validate_on_submit():
         
@@ -108,6 +123,24 @@ def config():
         flash('Config successfully updated.', 'success')
         return redirect(url_for('config', _anchor='exabgp'))
 
+    if peer_form.validate_on_submit():
+            
+        try:
+            # Create the new peer
+            new_peer = {
+                'ip': peer_form.ip_address.data,
+                'asn': int(peer_form.asn.data),
+                'state': 'down',
+            }
+
+            bgp_peers.insert_one(new_peer)
+        except:
+            flash('Error adding peer %s.' % peer_form.ip_address.data, 'warning')
+        else:
+            flash('Peer %s added' % peer_form.ip_address.data, 'success')
+
+        return redirect(url_for('config', _anchor='peers'))
+
     else:
 
         peers = list(bgp_peers.find())
@@ -116,7 +149,22 @@ def config():
         config_form.asn.data = config['local-as']
         config_form.router_id.data = config['router-id']
         config_form.local_ip.data = config['local-address']
-        return render_template('config.html', peers=peers, config=config, config_form=config_form)
+
+        return render_template('config.html', peers=peers, config=config, config_form=config_form, peer_form=peer_form)
+
+@app.route('/config/delete_peer/<peer_id>')
+def delete_peer(peer_id):
+
+    peer = bgp_peers.find_one({'_id': ObjectId(peer_id)})
+
+    try:
+        bgp_peers.remove(peer)
+    except:
+        flash('Error deleting peer %s' % peer['ip'], 'warning')
+    else:
+        flash('Peer %s deleted' % peer['ip'], 'success')
+    
+    return redirect(url_for('config', _anchor='peers'))
 
 @app.route('/config/logs')
 def logs():

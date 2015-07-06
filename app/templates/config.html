@@ -44,7 +44,7 @@ Config
 					    			<th>Prefixes Received</th>
 					    			<th>Prefixes Advertised</th>
 					    			<th>Action
-					    				<i class="fa fa-plus text-success pull-right" style="padding-top: 3px;"></i>
+					    				<i class="fa fa-plus text-success pull-right" style="padding-top: 3px;" data-toggle="modal" data-target="#addPeerModal"></i>
 					    			</th>
 					    		</thead>
 					    		<tbody>
@@ -55,15 +55,17 @@ Config
 							    				{% if peer.state == 'up' or peer.state == 'connected' %}
 							    					<i class="fa fa-circle text-success"></i>
 							    				{% else %}
-							    					<i class="fa fa-circle text-danger"></i>
+							    					<i class="fa fa-circle text-danger" data-toggle="tooltip" data-placement="top" title="{{ peer.state|title }}"></i>
 							    				{% endif %}
 							    			</td>
 							    			<td>{{ peer['asn'] }}</td>
 							    			<td>-</td>
 							    			<td>-</td>
 							    			<td>
-							    				<i class="fa fa-wrench"></i>
-							    				<i class="fa fa-trash-o text-danger"></i>
+							    				<a href="{{ url_for('peer', peer_id=peer['_id']) }}"><i class="fa fa-wrench"></i></a>
+							    				<a class="delete-peer" href="#" data-id="{{ peer['_id'] }}" data-ip="{{ peer['ip'] }}">
+							    					<i class="fa fa-trash-o text-danger"></i>
+							    				</a>
 							    			</td>
 						    			</tr>
 						    		{% endfor %}
@@ -112,6 +114,15 @@ Config
 			    	    		      <input id="limit" type="text" class="form-control" placeholder="50">
 			    	    		    </div>
 			    	    		</div>
+
+			    	    		<div class="col-md-3">
+				    	    		<div class="input-group">
+			    	    		      <span class="input-group-btn">
+			    	    		        <button class="btn btn-default" type="button">Peer</button>
+			    	    		      </span>
+			    	    		      <input id="peer" type="text" class="form-control" placeholder="10.1.1.1">
+			    	    		    </div>
+			    	    		</div>
 			    	    		
 			    	    		<div class="col-md-6">
 				    	    		<div class="btn-group" data-toggle="buttons" id="exclude_buttons">
@@ -147,17 +158,55 @@ Config
 
 		</div>
 
-
-	
-
-		
-		
 	</div>
+	
 </div>
 
+{% endblock %}
 
+{% block modals %}
+<div class="modal fade" id="addPeerModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Add Peer</h4>
+      </div>
+	    <form class='form' method="POST">
+      <div class="modal-body">
 
+        		{{ peer_form.hidden_tag() }}
+        		{{ wtf.form_errors(peer_form, hiddens="only") }}
 
+        		{{ wtf.form_field(peer_form.ip_address) }}
+        		{{ wtf.form_field(peer_form.asn) }}
+        		{{ wtf.form_field(peer_form.enabled) }}
+
+      </div>
+      <div class="modal-footer">
+		{{ wtf.form_field(peer_form.submit, button_map={'submit': 'primary'}) }}
+      </div>
+        	</form>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal fade" id="deletePeerModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Delete Peer</h4>
+      </div>
+      <div class="modal-body">
+	      <p>Are you sure you want to delete peer <span id="peer-ip"></span> and remove all advertised routes?</p>
+      </div>
+      <div class="modal-footer">
+      	<a href="#" class="btn btn-danger confirm-delete">Delete</a>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 {% endblock %}
 
 {% block scripts %}
@@ -172,6 +221,19 @@ Config
 	    window.location.hash = e.target.hash;
 	});
 
+	$('a.delete-peer').on('click', function(e){
+		e.preventDefault();
+
+		var peer_id = $(this).data('id');
+		var peer_ip = $(this).data('ip');
+
+		$('#deletePeerModal span#peer-ip').html(peer_ip);
+		$('#deletePeerModal a.confirm-delete').attr('href', '/config/delete_peer/' + peer_id);
+
+		$('#deletePeerModal').modal('show');
+
+	});
+
 	$('button.command').on('click', function(e){
 		var button = $(this);
 		var action = button.data('action');
@@ -184,7 +246,6 @@ Config
    			url : "/config/exabgp/" + action,
    			contentType: 'application/text;charset=UTF-8',
    			success: function(resp){
-   				console.log(resp);
 				$.notify(resp['result'], 'success');
 
    			}

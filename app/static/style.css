@@ -28,6 +28,10 @@ img.plugin {
 .width80 {
   width: 80px !important;
 }
+
+.modal {
+    z-index: 1520;
+}
 /*########  Special Layouts ########*/
 
 @media (min-width : 992px) {

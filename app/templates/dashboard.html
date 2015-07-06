@@ -17,28 +17,6 @@ Dashboard
 		<div class="row data">
 			<div class="col-md-6 panel panel-6-left panel-default">
 				<div class="panel-heading">
-					<h3 class="panel-title">Latest Updates</h3>
-				</div>
-				</br>
-				<div class="panel-body">
-					{% for update in updates %}
-						<p>
-							<strong>{{ update.type }}:</strong>
-							{{ update.peer }} ({{ update['time']|datetimeformat }}) -- 
-							{% if update.type == 'state' %}
-								{{ update.state }}
-							{% elif update.type == 'update' %}
-								{{ update['update'] }}
-							{% endif %}
-
-						</p>
-					{% endfor %}
-			    </div>
-
-			</div>
-
-			<div class="col-md-6 panel panel-6-right panel-default">
-				<div class="panel-heading">
 					<h3 class="panel-title">Peers</h3>
 				</div>
 				</br>
@@ -51,18 +29,23 @@ Dashboard
 							{% else %}
 								<i class="fa fa-circle text-danger"></i>
 							{% endif %}
-							<strong>{{ peer.ip }}: </strong> {{ peer.asn }}
+							<img src="{{ url_for('static', filename='images/rtr.png') }}" height=100 width=100>
+							</br>
+							<strong>{{ peer.ip }} </strong> </br> AS {{ peer.asn }}
 						</a>
 
 					{% endfor %}
 				</div>
 			</div>
+
+			<div class="col-md-6 panel panel-6-right panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Advertised Routes</h3>
+				</div>
+				</br>
+			</div>
 		</div>
 
-	
-
-		
-		
 	</div>
 </div>
 
@@ -74,5 +57,8 @@ Dashboard
 {% block scripts %}
 {{ super() }}
 
+<script type="text/javascript">
+	
+</script>
 
 {% endblock %}
