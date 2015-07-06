@@ -12,6 +12,7 @@ peer = {  #db.bgp_peers
 	'asn': 65000,
 	'state': 'up',
 	'current_prefixes': ['1.1.1.1/32', '200.200.1.0/24'],
+	'enabled': True
 }
 
 adv_route = {

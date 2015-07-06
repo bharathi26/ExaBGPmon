@@ -123,7 +123,7 @@ def object_formatter(line):
             'state': temp_message['neighbor']['state'],
         }
 
-        if message['state'] in ('up'):
+        if message['state'] == 'up':
             # Check if peer was previously down. If so, re-advertise routes
             peer = bgp_peers.find_one({'ip': message['peer']})
             if peer['state'] != 'up':
@@ -138,6 +138,10 @@ def object_formatter(line):
             bgp_peers.update_one({'ip': message['peer']}, {'$set': {'state': message['state']}})
 
             return message
+        
+        elif message['state'] == 'down':
+            bgp_peers.update_one({'ip': message['peer']}, {'$set': {'state': message['state'], 'current_prefixes': []}})
+
         else:
             bgp_peers.update_one({'ip': message['peer']}, {'$set': {'state': message['state']}})
 

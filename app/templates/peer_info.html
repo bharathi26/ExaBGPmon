@@ -32,7 +32,7 @@
 		        		{{ peer_form.hidden_tag() }}
 		        		{{ wtf.form_errors(peer_form, hiddens="only") }}
 
-		        		{{ wtf.form_field(peer_form.ip_address, disabled=True) }}
+		        		{{ wtf.form_field(peer_form.ip_address) }}
 		        		{{ wtf.form_field(peer_form.asn) }}
 		        		{{ wtf.form_field(peer_form.enabled) }}
 

@@ -31,6 +31,9 @@ def withdraw_route(peer, adv_route):
 	
 	r = post('http://localhost:5001', {'command': message})
 
+def send_exabgp_command(command):
+	r = post('http://localhost:5001', {'command': command})
+
 def is_exabgp_running():
 	""" This function checks if the exabgp process is running. """
 

@@ -59,4 +59,4 @@ class BGPPeer(Form):
     ip_address = StringField('IP Address', validators=[Required(), IPAddress()])
     asn = StringField('AS Number', validators=[Required(), Range(1, 65535)])
     enabled = BooleanField('Enabled')
-    submit = SubmitField('Save')
+    submit = SubmitField('Save')    submit = SubmitField('Save')

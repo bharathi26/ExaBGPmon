@@ -7,8 +7,8 @@ from sys import stdout
 from pymongo import ASCENDING, DESCENDING
 from config import Config
 from models import db, bgp_updates, bgp_peers, adv_routes, bgp_config
-from tasks import announce_route, withdraw_route, exabpg_process, is_exabgp_running
 from forms import AdvertiseRoute, ConfigForm, BGPPeer
+from tasks import announce_route, withdraw_route, exabpg_process, is_exabgp_running, send_exabgp_command, build_config_file
 from requests import ConnectionError
 
 app = Flask(__name__)
@@ -71,9 +71,24 @@ def peer(peer_id):
     
     if peer_form.validate_on_submit():
 
-        bgp_peers.update(peer, {'$set': {
-            'asn': peer_form.asn.data,
-        }})
+        bgp_peers.update(peer, {'$set': {'asn': peer_form.asn.data}})
+
+        # If there's a change in Peer's enabled state, edit exabgp config
+        if peer['enabled'] != peer_form.enabled.data:
+            print 'enabled changed from %s to %s' % (peer['enabled'], peer_form.enabled.data)
+            bgp_peers.update(peer, {'$set': {'enabled': peer_form.enabled.data}})
+            # Rebuild config file and reload ExaBGP config
+            build_config_file(bgp_config.find_one(), list(bgp_peers.find()))
+            try:
+                # Tear down neighbor connection
+                if not peer_form.enabled.data:
+                    send_exabgp_command('neighbor %s teardown 4' % peer['ip'])
+                    bgp_peers.update_one({'ip': peer['ip']}, {'$set': {'state': 'down', 'current_prefixes': []}})
+                exabpg_process('reload')
+            except ConnectionError:
+                # Ignore because ExaBGP will re-read config when it starts
+                pass
+
 
         flash('Changes saved', 'success')
         return redirect(url_for('peer', peer_id=peer_id))
@@ -83,6 +98,10 @@ def peer(peer_id):
 
         peer_form.ip_address.data = peer['ip']
         peer_form.asn.data = peer['asn']
+        try:
+            peer_form.enabled.data = peer['enabled']
+        except KeyError:
+            peer_form.enabled.data = False
 
         return render_template('peer_info.html', peer=peer, route_form=route_form, peer_form=peer_form, advertised_routes=advertised_routes)
 
@@ -131,6 +150,7 @@ def config():
                 'ip': peer_form.ip_address.data,
                 'asn': int(peer_form.asn.data),
                 'state': 'down',
+                'enabled': peer_form.enabled.data
             }
 
             bgp_peers.insert_one(new_peer)

@@ -24,7 +24,9 @@ Dashboard
 					{% for peer in peers %}
 						
 						<a class="btn btn-default" href="{{ url_for('peer', peer_id=peer['_id']) }}">
-							{% if peer.state == 'up' or peer.state == 'connected' %}
+							{% if not peer.enabled %}
+								<i class="fa fa-ban text-danger"></i>
+							{% elif peer.state == 'up' or peer.state == 'connected' %}
 								<i class="fa fa-circle text-success"></i>
 							{% else %}
 								<i class="fa fa-circle text-danger"></i>

@@ -52,8 +52,10 @@ Config
 						    			<tr>
 						    				<td>{{ peer['ip'] }}</td>
 						    				<td>
-							    				{% if peer.state == 'up' or peer.state == 'connected' %}
-							    					<i class="fa fa-circle text-success"></i>
+							    				{% if not peer.enabled %}
+							    					<i class="fa fa-ban text-danger" data-toggle="tooltip" data-placement="top" title="Disabled"></i>
+							    				{% elif peer.state == 'up' or peer.state == 'connected' %}
+							    					<i class="fa fa-circle text-success" data-toggle="tooltip" data-placement="top" title="{{ peer.state|title }}"></i>
 							    				{% else %}
 							    					<i class="fa fa-circle text-danger" data-toggle="tooltip" data-placement="top" title="{{ peer.state|title }}"></i>
 							    				{% endif %}
