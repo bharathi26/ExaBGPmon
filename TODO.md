@@ -3,7 +3,6 @@
 ## General
 * ExaBGp process status icon
 	* in footer or header, just a green or red icon for ExaBGP process status
-* Add button to re-create config file
 
 ## Peers
 * Edit
