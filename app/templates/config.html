@@ -241,9 +241,6 @@ Config
 		var action = button.data('action');
 
 		$.ajax({
-   			beforeSend: function(){
-   				// button.html(loading);
-   			},
    			type : "GET",
    			url : "/config/exabgp/" + action,
    			contentType: 'application/text;charset=UTF-8',
@@ -288,10 +285,10 @@ Config
 		setInterval(check_exabgp_status, 3000);
 	});
 
-	function get_logs(exclude, limit){
+	function get_logs(exclude, peer, limit){
 		$.ajax({
    			type : "GET",
-   			url : "/config/logs?limit=" + limit + "&exclude=" + exclude,
+   			url : "/config/logs?limit=" + limit + "&exclude=" + exclude + '&peer=' + peer,
    			contentType: 'application/json;charset=UTF-8',
    			success: function(resp){
    				$('div#log-table').html(resp);	
@@ -302,19 +299,21 @@ Config
 	$('a[href="#logs"]').on('show.bs.tab', function (e) {
 	    var limit = $('input#limit').val() || 50;
 	    var exclude = '';
-	    get_logs(exclude, limit);
+	    var peer = '';
+	    get_logs(exclude, peer, limit);
 	});
 
-	$('#exclude_buttons input, input#limit').on('change', function(e){
+	$('#exclude_buttons input, input#limit, input#peer').on('change', function(e){
 		var limit = $('input#limit').val() || 50;
 		var exclude = '';
+		var peer = $('input#peer').val();
 
 		$('#exclude_buttons input').each(function(e){
 			if (!$(this).prop('checked')) {
 				exclude += $(this).attr('id') + ',';
 			}
 		});
-		get_logs(exclude, limit);
+		get_logs(exclude, peer, limit);
 	});
 
 	var url = document.location.toString();

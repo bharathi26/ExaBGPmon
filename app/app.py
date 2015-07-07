@@ -194,12 +194,15 @@ def logs():
     except TypeError:
         limit = 250
 
-    try:
-        exclude = request.args.get('exclude').split(',')
-    except:
+    exclude = request.args.get('exclude').split(',')
+    if not exclude:
         exclude = []
 
-    updates = list(bgp_updates.find({'type': {'$nin': exclude}}, {'_id': False}).sort('time', DESCENDING).limit(limit))
+    peer = request.args.get('peer')
+    if not peer:
+        updates = list(bgp_updates.find({'type': {'$nin': exclude}}, {'_id': False}).sort('time', DESCENDING).limit(limit))
+    else:
+        updates = list(bgp_updates.find({'type': {'$nin': exclude}, 'peer': {'$eq': peer}}, {'_id': False}).sort('time', DESCENDING).limit(limit))
 
     return render_template('logs.html', updates=updates)
 
