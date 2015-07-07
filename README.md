@@ -2,10 +2,14 @@
 An HTTP frontend to the glorious ExaBGP
 
 ### Features
-* Configure Exabgp and generate a config file
-* Monitor and manage peers, also routes advertised
+* Configure ExaBGP and auto-generate a config file
+* Monitor and manage peers
+	* Control routes advertised
     * Automatically re-advertise when ExaBGP or peer comes back online
 * View prefixes received from peers
+
+![Dashboard](docs/dashboard.png "Dashboard")
+![Config](docs/config.png "Config")
 
 ### Running ExaBGPmon
 * Install and start MongoDB
