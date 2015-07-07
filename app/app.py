@@ -26,10 +26,22 @@ def minutes_ago(minutes):
 @app.route('/')
 def dashboard():
 
-    updates = [x for x in bgp_updates.find({'type': { '$nin': ['keepalive']}}).sort('time', DESCENDING).limit(10)]
+    prefixes_out = adv_routes.distinct('prefix')
+    prefixes_out_count = len(prefixes_out)
+    prefixes_in = bgp_peers.distinct('current_prefixes')
+    prefixes_in_count = len(prefixes_in)
+
     peers = list(bgp_peers.find())
 
-    return render_template('dashboard.html', updates=updates, peers=peers)
+    overview_counts = {
+        'prefixes_out': prefixes_out,
+        'prefixes_out_count': prefixes_out_count,
+        'prefixes_out_count': prefixes_out_count,
+        'prefixes_in' : prefixes_in,
+        'prefixes_in_count': prefixes_in_count,
+    }
+
+    return render_template('dashboard.html', overview_counts=overview_counts, peers=peers)
 
 @app.route('/peer/<peer_id>', methods=['GET', 'POST'])
 def peer(peer_id):

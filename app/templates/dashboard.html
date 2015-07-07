@@ -31,7 +31,7 @@ Dashboard
 							{% else %}
 								<i class="fa fa-circle text-danger"></i>
 							{% endif %}
-							<img src="{{ url_for('static', filename='images/rtr.png') }}" height=100 width=100>
+							<img src="{{ url_for('static', filename='images/rtr.png') }}" height=60 width=60>
 							</br>
 							<strong>{{ peer.ip }} </strong> </br> AS {{ peer.asn }}
 						</a>
@@ -42,9 +42,16 @@ Dashboard
 
 			<div class="col-md-6 panel panel-6-right panel-default">
 				<div class="panel-heading">
-					<h3 class="panel-title">Advertised Routes</h3>
+					<h3 class="panel-title">Overview</h3>
 				</div>
-				</br>
+				<div class="panel-body">
+					<dl class="">
+					  <dt>Prefixes advertised to peers: ({{ overview_counts['prefixes_out_count'] }})</dt>
+					  <dd>{{ overview_counts['prefixes_out']|join(', ') }}</dd>
+					  <dt>Prefixes received from peers: ({{ overview_counts['prefixes_in_count'] }})</dt>
+					  <dd>{{ overview_counts['prefixes_in']|join(', ') }}</dd>
+					</dl>
+				</div>
 			</div>
 		</div>
 
