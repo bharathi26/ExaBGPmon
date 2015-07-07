@@ -221,6 +221,14 @@ def logs():
 @app.route('/config/exabgp/<action>')
 def config_action(action):
 
+    current_config = bgp_config.find_one()
+    peers = list(bgp_peers.find())
+
+    #Rebuild config file before reload action
+    if action == 'reload':
+        build_config_file(current_config, peers)
+
+    # Send action control to ExaBGP
     result = exabpg_process(action)
 
     # Update ExaBGP state and last_start
