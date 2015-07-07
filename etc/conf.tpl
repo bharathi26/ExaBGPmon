@@ -22,12 +22,12 @@ group exabgpmon {
 	} 
 
 	{% for peer in peers %}
-		{% if peer['enabled'] %}
-		neighbor {{ peer['ip']}} { 
-			peer-as {{ peer['asn'] }}; 
-			local-as {{ peer['asn'] }};
-		}
-		{% endif %}
+	{%- if peer['enabled'] -%}
+	neighbor {{ peer['ip']}} { 
+		peer-as {{ peer['asn'] }}; 
+		local-as {{ peer['asn'] }};
+	}
+	{% endif %}
 	{% endfor %}
 
 }
