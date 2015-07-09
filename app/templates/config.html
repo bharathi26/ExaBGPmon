@@ -61,8 +61,8 @@ Config
 							    				{% endif %}
 							    			</td>
 							    			<td>{{ peer['asn'] }}</td>
-							    			<td>-</td>
-							    			<td>-</td>
+							    			<td>{{ prefix_counts[peer['ip']]['received']}}</td>
+							    			<td>{{ prefix_counts[peer['ip']]['advertised']}}</td>
 							    			<td>
 							    				<a href="{{ url_for('peer', peer_id=peer['_id']) }}"><i class="fa fa-wrench"></i></a>
 							    				<a class="delete-peer" href="#" data-id="{{ peer['_id'] }}" data-ip="{{ peer['ip'] }}">

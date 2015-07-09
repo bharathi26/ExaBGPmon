@@ -177,12 +177,19 @@ def config():
 
         peers = list(bgp_peers.find())
         config = bgp_config.find_one()
+        prefix_counts = {}
+        for peer in bgp_peers.find():
+            prefix_counts[peer['ip']] = {
+                'received': len(bgp_peers.distinct('current_prefixes', {'ip': {'$eq': peer['ip']}})),
+                'advertised': len(adv_routes.distinct('prefix', {'peer': {'$eq': peer['ip']}}))
+            }
 
         config_form.asn.data = config['local-as']
         config_form.router_id.data = config['router-id']
         config_form.local_ip.data = config['local-address']
 
-        return render_template('config.html', peers=peers, config=config, config_form=config_form, peer_form=peer_form)
+        return render_template('config.html', peers=peers, config=config, 
+            config_form=config_form, peer_form=peer_form, prefix_counts=prefix_counts)
 
 @app.route('/config/delete_peer/<peer_id>')
 def delete_peer(peer_id):
